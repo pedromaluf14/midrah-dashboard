@@ -371,6 +371,9 @@ footer{ display:flex; justify-content:space-between; flex-wrap:wrap; gap:6px; fo
 @media (max-width:640px){ .ads-grid{ grid-template-columns:1fr; } .summary{ font-size:15px; } }
 
 /* ===== Midrah: marca do cliente, lados Taurus × LUZIAC e verbas ===== */
+.client{ display:inline-flex; align-items:center; height:40px; }
+.client img{ height:26px; width:auto; display:block; }
+@media (max-width:640px){ .client img{ height:20px; } }
 .client-mark{ display:inline-flex; align-items:center; height:40px; padding:0 14px; border-radius:8px; background:#fff; color:#111; font-weight:800; font-size:15px; letter-spacing:.22em; }
 [data-mode="light"] .client-mark{ background:var(--ink); color:#fff; }
 #vg-product{ max-width:100%; text-overflow:ellipsis; }
@@ -448,7 +451,7 @@ footer{ display:flex; justify-content:space-between; flex-wrap:wrap; gap:6px; fo
 <div class="wrap">
 
   <header class="nav">
-    <span class="client-mark" aria-label="Midrah">MIDRAH</span>
+    <span class="client"><img src="assets/logo-midrah-branco.png" alt="Midrah" class="logo-dark"><img src="assets/logo-midrah.png" alt="Midrah" class="logo-light"></span>
     <nav class="tabs" role="tablist">
       <button class="tab-btn active" role="tab" aria-selected="true" data-tab="geral">Visão geral</button>
       <button class="tab-btn" role="tab" aria-selected="false" data-tab="produtos">Conjuntos</button>
