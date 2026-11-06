@@ -387,7 +387,9 @@ footer{ display:flex; justify-content:space-between; flex-wrap:wrap; gap:6px; fo
 .side-box{ background:var(--card-2); border:1px solid var(--line); border-radius:12px; padding:16px 18px; display:flex; flex-direction:column; gap:12px; min-width:0; }
 .side-box.s-luziac{ box-shadow:inset 3px 0 0 var(--pink); }
 .side-box.s-taurus{ box-shadow:inset 3px 0 0 var(--ink-soft); }
-.side-top{ display:flex; justify-content:space-between; align-items:baseline; gap:10px; flex-wrap:wrap; }
+.side-top{ display:flex; justify-content:space-between; align-items:center; gap:10px; flex-wrap:wrap; }
+.side-top h3, .vb-h h2{ display:flex; align-items:center; gap:8px; }
+.side-top h3 .side-chip, .vb-h h2 .side-chip{ margin:0; vertical-align:0; line-height:16px; }
 .side-top h3{ font-size:16px; font-weight:700; letter-spacing:-.01em; }
 .side-top small{ font-size:11.5px; color:var(--muted); }
 .side-nums{ display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:8px; }
@@ -505,10 +507,16 @@ footer{ display:flex; justify-content:space-between; flex-wrap:wrap; gap:6px; fo
         <div class="kpi glass"><span class="label mono">INVESTIMENTO <span class="help" tabindex="0" role="note" aria-label="Quanto foi gasto nos anúncios no período, segundo o Meta." data-tip="Quanto foi gasto nos anúncios no período, segundo o Meta.">?</span></span><span class="value mono" id="vg-spend">—</span><span class="delta" id="vg-spend-d"></span></div>
         <div class="kpi glass"><span class="label mono">CUSTO POR LEAD <span class="help" tabindex="0" role="note" aria-label="Quanto custou, em média, cada contato: investimento dividido pelos leads. Lead = a conversão da coluna Resultados do Meta (conversa iniciada no WhatsApp ou cadastro de formulário)." data-tip="Quanto custou, em média, cada contato: investimento dividido pelos leads. Lead = a conversão da coluna Resultados do Meta (conversa iniciada no WhatsApp ou cadastro de formulário).">?</span></span><span class="value mono" id="vg-cpl">—</span><span class="delta" id="vg-cpl-d"></span></div>
         <div class="kpi glass"><span class="label mono">HOJE ATÉ AGORA <span class="help" tabindex="0" role="note" aria-label="Resultados de hoje até a última atualização. O dia ainda não terminou, por isso fica fora dos outros números." data-tip="Resultados de hoje até a última atualização. O dia ainda não terminou, por isso fica fora dos outros números.">?</span></span><span class="value mono" id="today-leads">—</span><span class="delta"><span class="prev" id="today-spend"></span></span></div>
-        <div class="kpi glass kpi-saldo" id="kpi-saldo"><span class="label mono">FUNDOS DISPONÍVEIS <span class="help" tabindex="0" role="note" aria-label="Mesmo valor de “Fundos disponíveis” no Gerenciador de Anúncios: limite de gastos menos o valor gasto, mais o que já foi gasto e ainda não foi cobrado. A estimativa de dias usa só o limite menos o valor gasto, pelo gasto médio da última semana." data-tip="Mesmo valor de “Fundos disponíveis” no Gerenciador de Anúncios: limite de gastos menos o valor gasto, mais o que já foi gasto e ainda não foi cobrado. A estimativa de dias usa só o limite menos o valor gasto, pelo gasto médio da última semana.">?</span></span><span class="value mono" id="saldo-valor">—</span>
+        <div class="kpi glass kpi-saldo" id="kpi-saldo"><span class="label mono">SALDO DAS VERBAS <span class="help" tabindex="0" role="note" aria-label="Soma do que ainda resta das verbas (Taurus Cândia + LUZIAC · FIV), igual à aba Verbas: verba informada menos o gasto no Meta desde o início do período. Os dias = saldo ÷ orçamento ativo por dia hoje." data-tip="Soma do que ainda resta das verbas (Taurus Cândia + LUZIAC · FIV), igual à aba Verbas: verba informada menos o gasto no Meta desde o início do período. Os dias = saldo ÷ orçamento ativo por dia hoje.">?</span></span><span class="value mono" id="saldo-valor">—</span>
           <div class="track"><div class="fill" id="saldo-fill"></div></div>
           <span class="saldo-foot mono"><span id="saldo-dias"></span><span id="saldo-ritmo"></span></span></div>
       </div>
+    </section>
+
+    <section class="card vg-all">
+      <div class="card-h"><span class="ico"><svg viewBox="0 0 24 24"><path d="M12 3v18"/><path d="M4 7h6v10H4zM14 4h6v13h-6z"/></svg></span>
+        <div><h2>Taurus × LUZIAC (FIV)</h2><span class="card-sub" id="sides-sub"></span></div></div>
+      <div class="sides" id="sides"></div>
     </section>
 
     <div class="news" id="news" aria-roledescription="carrossel" aria-label="Novidades da semana" hidden>
@@ -535,12 +543,6 @@ footer{ display:flex; justify-content:space-between; flex-wrap:wrap; gap:6px; fo
         </div>
     </section>
 
-
-    <section class="card vg-all">
-      <div class="card-h"><span class="ico"><svg viewBox="0 0 24 24"><path d="M12 3v18"/><path d="M4 7h6v10H4zM14 4h6v13h-6z"/></svg></span>
-        <div><h2>Taurus × LUZIAC (FIV)</h2><span class="card-sub" id="sides-sub"></span></div></div>
-      <div class="sides" id="sides"></div>
-    </section>
 
     <section class="card vg-all">
       <div class="card-h"><span class="ico"><svg viewBox="0 0 24 24"><path d="M3 21V9l9-6 9 6v12"/><path d="M9 21v-7h6v7"/></svg></span>
@@ -930,16 +932,23 @@ function renderVG(){
   renderAds(e);
   if (isAll){ renderSides(); renderRank(); renderWho(); }
 }
+/* saldo das verbas (mesma conta da aba Verbas): verba − gasto no Meta desde VERBA_START */
+function verbaState(v){
+  const BUD=M.budgets||{}, started=T>=VERBA_START, camps=ACC.camps.filter(c=>v.re.test(c));
+  const spent=started?agg(camps,VERBA_START,T).spend:0;
+  return { camps, spent, saldo:v.amount-spent, budget:camps.reduce((a,c)=>a+(BUD[c]?BUD[c].daily:0),0) };
+}
 function renderSaldo(){
-  const A=M.account||{}, box=$('#kpi-saldo');
-  if (!A.spendCap){ $('#saldo-valor').textContent='sem limite'; $('#saldo-dias').textContent=''; $('#saldo-ritmo').textContent=''; $('#saldo-fill').style.width='0'; return; }
-  /* "Fundos disponíveis" do Gerenciador = limite − gasto + gasto ainda não cobrado (account_balance).
-     Os dias de autonomia usam limite − gasto, porque o não cobrado ainda vai sair. */
-  const fundos=A.spendCap-A.amountSpent+(A.balance||0), saldo=A.spendCap-A.amountSpent, ritmo=ACC.cur.spend/7, dias=ritmo>0?saldo/ritmo:Infinity;
-  box.dataset.level = dias<7?'baixo':'ok';
-  $('#saldo-valor').textContent=brl(fundos);
-  $('#saldo-fill').style.width=(isFinite(dias)?Math.max(0,Math.min(dias/14,1))*100:100)+'%';
-  $('#saldo-dias').textContent=isFinite(dias)?'≈ '+dec1(Math.max(dias,0))+' DIAS':''; $('#saldo-ritmo').textContent=brl(ritmo)+'/DIA';
+  const box=$('#kpi-saldo'), st=VERBAS.map(verbaState);
+  const total=VERBAS.reduce((a,v)=>a+v.amount,0), saldo=st.reduce((a,x)=>a+Math.max(x.saldo,0),0), ritmo=st.reduce((a,x)=>a+x.budget,0);
+  const dias=ritmo>0?saldo/ritmo:Infinity, left=T>VERBA_END?0:diff(T<VERBA_START?VERBA_START:T,VERBA_END)+1;
+  box.dataset.level = isFinite(dias)&&dias<Math.min(7,left)?'baixo':'ok';
+  $('#saldo-valor').textContent=brl(saldo);
+  $('#saldo-fill').style.width=(total>0?Math.max(0,Math.min(saldo/total,1))*100:0)+'%';
+  $('#saldo-dias').textContent=isFinite(dias)?'≈ '+dec1(Math.max(dias,0))+' DIAS':'SEM ORÇAMENTO ATIVO';
+  $('#saldo-ritmo').textContent=ritmo?brl(ritmo)+'/DIA':'';
+  box.style.cursor='pointer'; box.title='Ver a aba Verbas';
+  box.onclick=ev=>{ if (ev.target.closest('.help')) return; setTab('verbas'); scrollTo({top:0,behavior:'smooth'}); };
 }
 function renderSides(){
   const R=periodRange(), o=cmpOn&&R.pa, when=perText(vgPeriod,R);
